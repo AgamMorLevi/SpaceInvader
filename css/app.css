@@ -1,0 +1,32 @@
+body {
+  background-color: black;
+  color:white;
+  text-align: center;
+}
+
+.board-container {
+  margin: auto;
+}
+
+.cell {
+      font-size: 1em;
+    width: 2em;
+    height: 2em;
+    border: 1px solid white;
+}
+
+.victorious-container {
+   
+  font-size: 20px; 
+  color: red; 
+  text-align: center;
+  margin-top: 20px;
+}
+
+.message{
+  font-size: 20px; 
+  color: red; 
+  text-align: center;
+  margin-top: 20px;
+}
+
