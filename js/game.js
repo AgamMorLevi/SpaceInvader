@@ -1,14 +1,14 @@
 'use strict'
 
 const BOARD_SIZE = 14
+// const ALIEN_ROW_LENGTH = gLevel[0].ALIEN_ROW_LENGTH
 const ALIEN_ROW_LENGTH = 8
 const ALIEN_ROW_COUNT = 3
+// const ALIEN_SPEED = gLevel[0].ALIEN_SPEED
+const ALIEN_SPEED = 1000
 const HERO = '♆'
 const SKY = '^'
-const LASER = '⤊'
 const EMPTY = ''
-const ALIEN = '👽'
-// Matrix of cell objects. e.g.: {type: SKY, gameObject: ALIEN
 
 var gBoard
 var gGame = {
@@ -115,7 +115,9 @@ function restartGame() {
   var elVictoryContainer = document.querySelector('.victorious-container')
   elVictoryContainer.style.display = 'none'
   gIsAlienFreeze = false
+  gSuperAttacks = 3
   gAliens = []
+  gDirection = 'right'
   onInit()
 }
 

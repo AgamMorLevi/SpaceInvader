@@ -1,7 +1,7 @@
 'use strict'
 
-const ALIEN_SPEED = 1000
 var gIntervalAliens
+var gIntervalCandys
 var gAliens = []
 var gDirection = 'right'
 var isDown = false
@@ -22,21 +22,39 @@ function createAliens(board) {
       const gAlien = {
         pos: { i: i, j: j },
         speed: ALIEN_SPEED,
+        isCandy: false,
+        gameObject: getAlienIcon({ pos: { i, j }, type: SKY }),
+        type: SKY,
       }
       gAliens.push(gAlien)
       gGame.alienCount++
-      board[i][j] = { gameObject: ALIEN, type: SKY }
+      board[i][j] = gAlien
+      getAlienIcon(gAlien)
     }
   }
   gIntervalAliens = setInterval(moveAliens, ALIEN_SPEED)
+  // gIntervalCandys = setInterval(addCandy, 10000)
+}
+
+function getAlienIcon(gAlien) {
+  if (gAlien.gameObject === EMPTY) return EMPTY
+  if (gAlien.pos.i === gAliensTopRowIdx) {
+    return '👽'
+  } else if (gAlien.pos.i === gAliensBottomRowIdx) {
+    return '👾'
+  } else {
+    return '😃'
+  }
 }
 
 function shiftBoardRight(board, fromI, toI) {
   for (var i = fromI; i <= toI; i++) {
     for (var j = BOARD_SIZE - 1; j >= 0; j--) {
-      if (board[i][j].gameObject === ALIEN && j + 1 < BOARD_SIZE) {
-        updateCell({ i, j }, EMPTY)
-        updateCell({ i, j: j + 1 }, ALIEN)
+      if (board[i][j].gameObject !== EMPTY && j + 1 < BOARD_SIZE) {
+        const newIcon = getAlienIcon({ pos: { i, j }, type: SKY })
+        updateCell({ i, j: j }, EMPTY)
+        updateCell({ i, j: j + 1 }, newIcon)
+        board[i][j + 1].gameObject = newIcon
       }
     }
   }
@@ -46,9 +64,11 @@ function shiftBoardRight(board, fromI, toI) {
 function shiftBoardLeft(board, fromI, toI) {
   for (var i = fromI; i <= toI; i++) {
     for (var j = 0; j < BOARD_SIZE; j++) {
-      if (board[i][j].gameObject === ALIEN && j - 1 >= 0) {
+      if (board[i][j].gameObject !== EMPTY && j - 1 >= 0) {
+        const newIcon = getAlienIcon({ pos: { i, j }, type: SKY })
         updateCell({ i, j }, EMPTY)
-        updateCell({ i, j: j - 1 }, ALIEN)
+        updateCell({ i, j: j - 1 }, newIcon)
+        board[i][j - 1].gameObject = newIcon
       }
     }
   }
@@ -58,10 +78,12 @@ function shiftBoardLeft(board, fromI, toI) {
 function shiftBoardDown(board, fromI, toI) {
   for (var i = toI; i >= fromI; i--) {
     for (var j = 0; j < BOARD_SIZE; j++) {
-      if (board[i][j].gameObject === ALIEN) {
+      if (board[i][j].gameObject !== EMPTY) {
         updateCell({ i, j }, EMPTY)
         if (i + 1 < BOARD_SIZE) {
-          updateCell({ i: i + 1, j }, ALIEN)
+          const newIcon = getAlienIcon({ pos: { i, j }, type: SKY })
+          updateCell({ i: i + 1, j }, newIcon)
+          board[i + 1][j].gameObject = newIcon
         }
       }
     }
@@ -95,7 +117,9 @@ function moveAliens() {
       shiftBoardRight(board, gAliensTopRowIdx, gAliensBottomRowIdx)
     }
   }, 10)
+
   moveAlien()
+
   if (gAliensBottomRowIdx >= gHero.pos.i) {
     clearInterval(gIntervalAliens)
     gameOver()
@@ -113,4 +137,29 @@ function moveAlien() {
       gAlien.pos.j += 1
     }
   })
+}
+
+function addCandy() {
+  var aliensInBottomRow = gAliens.filter((alien) => alien.pos.i === gAliensBottomRowIdx)
+
+  if (aliensInBottomRow.length === 0) return
+
+  var randomIndex = getRandomInt(0, aliensInBottomRow.length - 1)
+  var randomAlien = aliensInBottomRow[randomIndex]
+
+  var gAlianMach = gAliens.find((gAlien) => gAlien.pos === randomAlien.pos)
+  console.log(gAlianMach)
+  gAlianMach.isCandy = true
+  return '🍬'
+
+  // setTimeout(() => {
+  //   gAliens.forEach((gAlien) => {
+  //     if (gAlien.alienSymbol === CANDY) {
+  //       alienSymbol = ALIEN
+  //       gAlien.symbol = alienSymbol
+  //       gAlien.isCandy = false
+  //       updateCell(gAlien.pos, ALIEN)
+  //     }
+  //   })
+  // }, 5000)
 }
