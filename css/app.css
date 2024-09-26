@@ -2,31 +2,43 @@ body {
   background-color: black;
   color:white;
   text-align: center;
+  background-image: url(../img/space.jpg);
 }
 
 .board-container {
   margin: auto;
 }
-
+table {
+  border-collapse: separate; 
+  border-spacing: 15px; 
+}
 .cell {
       font-size: 1em;
     width: 2em;
     height: 2em;
-    border: 1px solid white;
 }
 
 .victorious-container {
-   
-  font-size: 20px; 
-  color: red; 
+  position: absolute;
+  top: calc(50% - 75px);
+  left: calc(50% - 75px);
+  text-align: center;
+}
+
+.message{
+  font-size: 40px; 
+  color: aqua; 
   text-align: center;
   margin-top: 20px;
 }
 
-.message{
-  font-size: 20px; 
-  color: red; 
-  text-align: center;
-  margin-top: 20px;
+.restart{
+
+  background-color: aqua;
+  border-radius: 4px;
+  width: 100px;
+  height: 60px;
+  border: none;
+  cursor: pointer;
 }
 

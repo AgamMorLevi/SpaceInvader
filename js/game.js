@@ -1,12 +1,8 @@
 'use strict'
 
 const BOARD_SIZE = 14
-// const ALIEN_ROW_LENGTH = gLevel[0].ALIEN_ROW_LENGTH
-const ALIEN_ROW_LENGTH = 8
-const ALIEN_ROW_COUNT = 3
-// const ALIEN_SPEED = gLevel[0].ALIEN_SPEED
-const ALIEN_SPEED = 1000
-const HERO = '♆'
+const ALIEN_SPEED = 500
+const HERO = '<img src="img/spaceship.png" alt="Hero" style="width: 35px; height: 35px;">'
 const SKY = '^'
 const EMPTY = ''
 
@@ -16,6 +12,8 @@ var gGame = {
   alienCount: 0,
   score: 0,
 }
+
+var elVictoryContainer = document.querySelector('.victorious-container')
 
 // Called when game loads
 function onInit() {
@@ -96,7 +94,8 @@ function renderScore() {
 
 function gameOver() {
   gIsAlienFreeze = true
-  var elVictoryContainer = document.querySelector('.victorious-container')
+  clearInterval(gIntervalAliens)
+  console.log('gameOver:', elVictoryContainer)
   elVictoryContainer.style.display = 'block'
 
   var elMsg = document.querySelector('.message')
@@ -108,23 +107,31 @@ function gameOver() {
     elMsg.innerText = 'You lost, try again'
   }
   var elRestartBtn = document.querySelector('.restart')
+  elRestartBtn.setAttribute('onclick', 'restartGame()')
   elRestartBtn.innerText = 'RESTART'
 }
 
 function restartGame() {
-  var elVictoryContainer = document.querySelector('.victorious-container')
   elVictoryContainer.style.display = 'none'
-  gIsAlienFreeze = false
-  gSuperAttacks = 3
   gAliens = []
-  gDirection = 'right'
+  gGame.alienCount = 0
+  gIsAlienFreeze = false
+  isMovingRight = true
+  gDirection = 'Right'
+  gSuperAttacks = 3
+  gGame.score = 0
+  gBoard = []
   onInit()
 }
 
+function start() {
+  elVictoryContainer.style.display = 'none'
+  gIsAlienFreeze = false
+}
+
 function rendervictoryContainer() {
-  var elVictoryContainer = document.querySelector('.victorious-container')
   elVictoryContainer.innerHTML = `
   <h2 class="message"></h2>
-  <button class="restart" onclick="restartGame()">START</button>
+  <button class="restart" onclick="start()">START</button>
   `
 }

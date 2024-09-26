@@ -2,8 +2,8 @@
 
 const LASER_SPEED = 80
 const LASER_SUPER_SPEED = 40
-const LASER = '⤊'
-const SUPER_LASER = '^'
+const LASER = '<img src="img/shoot.png" alt="LASER" style="width: 25px; height: 25px;">'
+const SUPER_LASER = '<img src="img/rocket.png" alt="SUPER_LASER" style="width: 25px; height: 30px;">'
 
 var gHero
 var laserInterval
@@ -23,6 +23,7 @@ function createHero(board) {
 // Handle game keys
 // Move the hero right (1) or left (-1)
 function onKeyDown(ev) {
+  if (gIsAlienFreeze) return
   switch (ev.key) {
     case 'ArrowLeft':
       moveHero(-1)
@@ -69,11 +70,8 @@ function shoot(cas) {
 
   laserInterval = setInterval(() => {
     if (gBoard[gLaserPos.i][gLaserPos.j].gameObject !== EMPTY) {
-      console.log(gGame.alienCount, 'alienCount')
-      gGame.alienCount--
       if (cas === 'n') {
         blowUpNeighbors(gBoard, gLaserPos.i, gLaserPos.j)
-        console.log(gGame.alienCount, 'alienCount')
       }
 
       clearInterval(laserInterval)
@@ -84,7 +82,6 @@ function shoot(cas) {
       if (gHero.isSuper) {
         resetSuperMode()
       }
-
       return
     }
 
@@ -110,21 +107,13 @@ function blinkLaser(pos) {
 }
 
 function alienShooted(laserPos) {
+  gGame.alienCount--
+  var shootedAlien = gAliens.findIndex((gAlien) => gAlien.pos.i === laserPos.i && gAlien.pos.j === laserPos.j)
+
   updateCell(laserPos, EMPTY)
-  var shootedAlien = gAliens.findIndex((alien) => alien.pos.i === laserPos.i && alien.pos.j === laserPos.j)
+
   gAliens.splice(shootedAlien, 1)
   gGame.score += 10
-
-  var isBottomRowEmpty = true
-  gAliens.forEach((alien) => {
-    if (alien.pos.i === gAliensBottomRowIdx) {
-      isBottomRowEmpty = false
-    }
-  })
-
-  if (isBottomRowEmpty) {
-    gAliensBottomRowIdx--
-  }
 
   if (gGame.alienCount === 0) {
     gameOver()
@@ -141,9 +130,9 @@ function blowUpNeighbors(board, rowIdx, colIdx) {
       var currCell = board[i][j]
       if (currCell.gameObject !== EMPTY) {
         alienShooted({ i, j })
-        gGame.alienCount--
       }
     }
+    gHero.isShoot = false
   }
   gHero.isShoot = false
 }
