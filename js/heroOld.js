@@ -6,14 +6,10 @@ const LASER = '<img src="img/shoot.png" alt="LASER" style="width: 25px; height: 
 const SUPER_LASER = '<img src="img/rocket.png" alt="SUPER_LASER" style="width: 25px; height: 30px;">'
 
 var gHero
-var gLaserPos
 var laserInterval
 var gSuperAttacks = 3
 var laserSpeed = LASER_SPEED
 var laserSymbol = LASER
-
-var gAlianSortedByJ = []
-var gAlianSortedByI = []
 // creates the hero and place it on board
 function createHero(board) {
   gHero = {
@@ -70,66 +66,64 @@ function moveHero(dir) {
 function shoot(cas) {
   gHero.isShoot = true
 
-  gLaserPos = { i: gHero.pos.i - 1, j: gHero.pos.j }
+  var gLaserPos = { i: gHero.pos.i - 1, j: gHero.pos.j }
 
   laserInterval = setInterval(() => {
-    blinkLaser(gLaserPos, cas)
+    if (gBoard[gLaserPos.i][gLaserPos.j].gameObject !== EMPTY) {
+      if (cas === 'n') {
+        blowUpNeighbors(gBoard, gLaserPos.i, gLaserPos.j)
+      }
+
+      clearInterval(laserInterval)
+      alienShooted(gLaserPos)
+      gHero.isShoot = false
+      renderScore()
+
+      if (gHero.isSuper) {
+        resetSuperMode()
+      }
+      return
+    }
+
+    if (gLaserPos.i === 0) {
+      clearInterval(laserInterval)
+      gHero.isShoot = false
+      return
+    }
+    gLaserPos.i--
+    updateCell({ i: gLaserPos.i + 1, j: gLaserPos.j }, EMPTY)
+    if (gBoard[gLaserPos.i][gLaserPos.j].gameObject === EMPTY) {
+      blinkLaser(gLaserPos)
+    }
   }, laserSpeed)
 }
 
 // renders a LASER at specific cell for short time and removes it
-
-function blinkLaser(gLaserPos, cas) {
-  gLaserPos.i--
-
-  if (gLaserPos.i < 0) {
-    clearInterval(laserInterval)
-    renderBoard(gBoard)
-    gHero.isShoot = false
-    return
-  }
-
-  if (gBoard[gLaserPos.i][gLaserPos.j].gameObject === ALIEN) {
-    clearInterval(laserInterval)
-    renderBoard(gBoard)
-    playSound()
-    alienShooted(gLaserPos, cas)
-    renderScore()
-
-    if (gHero.isSuper) {
-      resetSuperMode()
-    }
-  }
-
-  updateCell(gLaserPos, laserSymbol)
-  updateCell({ i: gLaserPos.i + 1, j: gLaserPos.j }, EMPTY)
-
+function blinkLaser(pos) {
+  updateCell(pos, laserSymbol)
   setTimeout(() => {
-    updateCell(gLaserPos, EMPTY)
+    updateCell(pos, EMPTY)
   }, laserSpeed / 2)
 }
 
-function alienShooted(shootedAlienPos, cas) {
+function alienShooted(laserPos) {
   gGame.alienCount--
-  gGame.score += 10
-  updateCell(shootedAlienPos, EMPTY)
+  var shootedAlien = gAliens.findIndex((gAlien) => gAlien.pos.i === laserPos.i && gAlien.pos.j === laserPos.j)
+  gAliens.splice(shootedAlien, 1)
 
-  if (cas === 'n') {
-    blowUpNeighbors(gBoard, shootedAlienPos.i, shootedAlienPos.j)
-    return
-  }
+  updateCell(laserPos, EMPTY)
+
+  gGame.score += 10
 
   if (gGame.alienCount === 0) {
     gameOver()
-    return
   }
-  renderBoard(gBoard)
-  gHero.isShoot = false
 }
 
 function blowUpNeighbors(board, rowIdx, colIdx) {
   for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
     if (i < 0 || i >= board.length) continue
+
     for (var j = colIdx - 1; j <= colIdx + 1; j++) {
       if (i === rowIdx && j === colIdx) continue
       if (j < 0 || j >= board[0].length) continue
@@ -138,6 +132,7 @@ function blowUpNeighbors(board, rowIdx, colIdx) {
         alienShooted({ i, j })
       }
     }
+    gHero.isShoot = false
   }
   gHero.isShoot = false
 }

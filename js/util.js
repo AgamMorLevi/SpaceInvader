@@ -19,33 +19,21 @@ function getRandomInt(min, max) {
 //   },
 //   {
 //     LEVEL: 'Hard',
-//     ALIEN_ROW_LENGTH: 12,
+//     ALIEN_ROW_LENGTH: 10,
 //     ALIEN_SPEED: 1500,
 //   },
 // ]
-
 // var level = gLevel[0]
-
-// function selectLevel(i){
+// function selectLevel(i) {
 //   level = gLevel[i]
-//   restartGame()
+//   console.log(level)
+//   onInit()
 // }
 
-// function createBtnLevel(){
+// function createBtnLevel() {
 //   var btnVal = ''
 //   for (var i = 0; i < 3; i++) {
-//    btnVal += `<button onclick="selectLevel(${i})">${gLevel[i].LEVEL}</button>`
-// }
-// document.querySelector('.levels-container').innerHTML = btnVal
-// }
-
-// var lives = 3
-
-// function createLives(){
-//   var livesVal = ''
-//   for (var i = 0; i < lives; i++) {
-//       livesVal += `<div class="live">${LIVE_IMG}</div>`
-
-// }
-// document.querySelector('.lives-container').innerHTML = livesVal
+//     btnVal += `<button onclick="selectLevel(${i})">${gLevel[i].LEVEL}</button>`
+//   }
+//   document.querySelector('.levels-container').innerHTML = btnVal
 // }

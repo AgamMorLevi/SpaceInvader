@@ -20,9 +20,6 @@ function createAliens(board) {
     for (var j = 0; j < ALIEN_ROW_LENGTH; j++) {
       const gAlien = createAlien(i, j)
       board[i][j].gameObject = gAlien.gameObject
-      if (board[i][j] === board[gAliensBottomRowIdx][j]) {
-        gAlien.type = 'EDGE'
-      }
     }
   }
   gIntervalAliens = setInterval(() => moveAliens(board), ALIEN_SPEED)
@@ -33,7 +30,8 @@ function createAlien(i, j) {
     pos: { i: i, j: j },
     isCandy: false,
     gameObject: ALIEN,
-    type: SKY,
+    type: 'ALIEN',
+    isShooted: false,
   }
   gAliens.push(gAlien)
   gGame.alienCount++
@@ -42,23 +40,24 @@ function createAlien(i, j) {
 
 function moveAliens(board) {
   if (gIsAlienFreeze) return
+
   gDirection = getMoveDir()
+
   if (gDirection === 'Down') {
+    updateAlienPositions(gDirection)
     gDirection = isMovingRight ? 'Right' : 'Left'
-    console.log(gDirection)
+    updateAlienPositions(gDirection)
     shouldMoveDown = true
   }
 
   if (shouldMoveDown) {
     shiftBoardDown(board, gAliensTopRowIdx, gAliensBottomRowIdx)
     shouldMoveDown = false
-    updateAlienPositions(gDirection)
   } else {
     switch (gDirection) {
       case 'Left':
         shiftBoardLeft(board, gAliensTopRowIdx, gAliensBottomRowIdx)
         break
-
       case 'Right':
         shiftBoardRight(board, gAliensTopRowIdx, gAliensBottomRowIdx)
         break
@@ -73,8 +72,8 @@ function moveAliens(board) {
 
 function getMoveDir() {
   gDirection = isMovingRight ? 'Right' : 'Left'
-  for (var i = 0; i < gAliens.length - 1; i++) {
-    if (gAliens[i].pos.j === BOARD_SIZE) {
+  for (var i = 0; i < gAliens.length; i++) {
+    if (gAliens[i].pos.j === BOARD_SIZE - 1) {
       isMovingRight = false
       gDirection = 'Down'
       break
@@ -96,7 +95,7 @@ function updateAlienPositions(direction) {
         if (gAliens[i].pos.j >= 0) gAliens[i].pos.j -= 1
         break
       case 'Right':
-        if (gAliens[i].pos.j <= BOARD_SIZE) gAliens[i].pos.j += 1
+        if (gAliens[i].pos.j < BOARD_SIZE - 1) gAliens[i].pos.j += 1
         break
       case 'Down':
         if (gAliens[i].pos.i < BOARD_SIZE - 1) gAliens[i].pos.i += 1
@@ -105,23 +104,13 @@ function updateAlienPositions(direction) {
   }
 }
 
-// function getAlienIcon(gAlien) {
-//   if (gAlien.isCandy) return '🍬'
-//   if (gAlien.pos.i === gAliensTopRowIdx) return '👽'
-//   if (gAlien.pos.i === gAliensBottomRowIdx) return '👾'
-//   return '😃'
-// }
-
 function shiftBoardRight(board, fromI, toI) {
   for (var i = fromI; i <= toI; i++) {
     for (var j = BOARD_SIZE - 1; j >= 0; j--) {
-      if (board[i][j].gameObject === ALIEN && j + 1 < BOARD_SIZE) {
+      if (board[i][j].gameObject === ALIEN && j < BOARD_SIZE - 1) {
         updateCell({ i, j: j }, EMPTY)
         updateCell({ i, j: j + 1 }, ALIEN)
         board[i][j + 1].gameObject = ALIEN
-
-        const alien = gAliens.find((a) => a.pos.i === i && a.pos.j === j)
-        if (alien) alien.pos.j += 1
       }
     }
   }
@@ -131,13 +120,10 @@ function shiftBoardRight(board, fromI, toI) {
 function shiftBoardLeft(board, fromI, toI) {
   for (var i = fromI; i <= toI; i++) {
     for (var j = 0; j < BOARD_SIZE; j++) {
-      if (board[i][j].gameObject === ALIEN && j - 1 >= 0) {
+      if (board[i][j].gameObject === ALIEN && j > 0) {
         updateCell({ i, j }, EMPTY)
         updateCell({ i, j: j - 1 }, ALIEN)
         board[i][j - 1].gameObject = ALIEN
-
-        const alien = gAliens.find((a) => a.pos.i === i && a.pos.j === j)
-        if (alien) alien.pos.j -= 1
       }
     }
   }
@@ -152,13 +138,9 @@ function shiftBoardDown(board, fromI, toI) {
         if (i + 1 < BOARD_SIZE) {
           updateCell({ i: i + 1, j }, ALIEN)
           board[i + 1][j].gameObject = ALIEN
-
-          const alien = gAliens.find((a) => a.pos.i === i && a.pos.j === j)
-          if (alien) alien.pos.i += 1
         }
       }
     }
-    isDown = false
     renderBoard(board)
   }
 

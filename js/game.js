@@ -1,8 +1,8 @@
 'use strict'
 
 const BOARD_SIZE = 14
-const ALIEN_SPEED = 500
-const HERO = '<img src="img/spaceship.png" alt="Hero" style="width: 35px; height: 35px;">'
+const ALIEN_SPEED = 300
+const HERO = '<img src="img/spaceship.png" alt="Hero" style="width: 30px; height: 30px;">'
 const SKY = '^'
 const EMPTY = ''
 
@@ -16,6 +16,7 @@ var gGame = {
 var elVictoryContainer = document.querySelector('.victorious-container')
 
 // Called when game loads
+
 function onInit() {
   gGame.score = 0
   gGame.alienCount = 0
@@ -79,6 +80,7 @@ function createCell(gameObject = null) {
 // position such as: {i: 2, j: 7}
 function updateCell(pos, gameObject = null) {
   gBoard[pos.i][pos.j].gameObject = gameObject // modal
+  //console.log(gAliens)
   var elCell = getElCell(pos) //DOM
   elCell.innerHTML = gameObject || EMPTY
 }
@@ -95,7 +97,7 @@ function renderScore() {
 function gameOver() {
   gIsAlienFreeze = true
   clearInterval(gIntervalAliens)
-  console.log('gameOver:', elVictoryContainer)
+
   elVictoryContainer.style.display = 'block'
 
   var elMsg = document.querySelector('.message')
@@ -134,4 +136,9 @@ function rendervictoryContainer() {
   <h2 class="message"></h2>
   <button class="restart" onclick="start()">START</button>
   `
+}
+
+function playSound() {
+  var sound = new Audio('../sound/questionable-chicken-86687.mp3')
+  sound.play()
 }
